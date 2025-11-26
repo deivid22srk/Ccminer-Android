@@ -1,0 +1,173 @@
+════════════════════════════════════════════════════════════════
+                    INSTRUÇÕES DE COMPILAÇÃO
+                        VERUS MINER APP
+════════════════════════════════════════════════════════════════
+
+✅ BINÁRIO CCMINER JÁ INCLUÍDO!
+═══════════════════════════════════════
+
+O binário do ccminer ARM64 (160KB) já está incluído em:
+  app/src/main/assets/ccminer/arm64-v8a/ccminer
+
+NÃO precisa baixar nada manualmente!
+
+════════════════════════════════════════════════════════════════
+📋 REQUISITOS
+════════════════════════════════════════════════════════════════
+
+✅ JDK 17
+✅ Android SDK com API 34
+✅ Android Studio (recomendado) OU ferramentas de linha de comando
+✅ Conexão com internet (primeira compilação)
+
+════════════════════════════════════════════════════════════════
+🔨 COMPILAR COM ANDROID STUDIO (RECOMENDADO)
+════════════════════════════════════════════════════════════════
+
+1. Abra o Android Studio
+2. Clique em "Open" e selecione a pasta VerusMiner
+3. Aguarde o Gradle sincronizar (pode demorar alguns minutos)
+4. Clique em Build > Build Bundle(s) / APK(s) > Build APK(s)
+5. APK estará em: app/build/outputs/apk/debug/app-debug.apk
+
+IMPORTANTE: A primeira compilação demora 5-15 minutos!
+          Gradle precisa baixar dependências.
+          Compilações seguintes são mais rápidas.
+
+════════════════════════════════════════════════════════════════
+🔨 COMPILAR NA LINHA DE COMANDO
+════════════════════════════════════════════════════════════════
+
+# Entre na pasta do projeto
+cd VerusMiner
+
+# Torne o gradlew executável (Linux/Mac)
+chmod +x gradlew
+
+# Compile o APK debug
+./gradlew assembleDebug
+
+# Windows:
+gradlew.bat assembleDebug
+
+# O APK estará em:
+# app/build/outputs/apk/debug/app-debug.apk
+
+════════════════════════════════════════════════════════════════
+📦 INSTALAÇÃO NO CELULAR
+════════════════════════════════════════════════════════════════
+
+Opção 1 - Via ADB:
+  adb install app/build/outputs/apk/debug/app-debug.apk
+
+Opção 2 - Manual:
+  1. Copie o APK para o celular
+  2. Ative "Fontes desconhecidas" nas configurações
+  3. Toque no APK e instale
+
+════════════════════════════════════════════════════════════════
+🚀 USAR GITHUB ACTIONS (COMPILAÇÃO AUTOMÁTICA)
+════════════════════════════════════════════════════════════════
+
+1. Faça push do código para o GitHub
+2. Vá na aba "Actions"
+3. O APK será compilado automaticamente
+4. Baixe o APK dos artifacts
+
+O workflow já está configurado em:
+  .github/workflows/build.yml
+
+════════════════════════════════════════════════════════════════
+❌ PROBLEMAS COMUNS
+════════════════════════════════════════════════════════════════
+
+Problema: Gradle demora muito na primeira compilação
+Solução:  NORMAL! Pode levar 5-15 minutos.
+          Está baixando dependências.
+          Próximas compilações são rápidas.
+
+Problema: "SDK location not found"
+Solução:  Crie arquivo local.properties com:
+          sdk.dir=/caminho/para/seu/Android/Sdk
+
+Problema: Erro de memória (OutOfMemoryError)
+Solução:  Adicione em gradle.properties:
+          org.gradle.jvmargs=-Xmx4096m
+
+Problema: Erro de versão do Kotlin
+Solução:  Limpe e recompile:
+          ./gradlew clean
+          ./gradlew assembleDebug
+
+════════════════════════════════════════════════════════════════
+🔍 VERIFICAR BINÁRIO CCMINER
+════════════════════════════════════════════════════════════════
+
+# Verificar se existe
+ls -lh app/src/main/assets/ccminer/arm64-v8a/ccminer
+
+# Verificar arquitetura
+file app/src/main/assets/ccminer/arm64-v8a/ccminer
+
+Deve mostrar: ELF 64-bit LSB shared object, ARM aarch64
+
+════════════════════════════════════════════════════════════════
+📊 INFORMAÇÕES TÉCNICAS
+════════════════════════════════════════════════════════════════
+
+Binário CCMiner:  160 KB
+APK final:        15-20 MB
+Instalado:        25-30 MB
+
+SDK mínimo:       Android 7.0 (API 24)
+SDK alvo:         Android 14 (API 34)
+Arquitetura:      ARM64 (arm64-v8a)
+Gradle:           8.2
+Kotlin:           1.9.20
+
+════════════════════════════════════════════════════════════════
+⚠️ IMPORTANTE
+════════════════════════════════════════════════════════════════
+
+✅ Funciona APENAS em celulares ARM64 reais
+❌ NÃO funciona em emulador (arquitetura x86)
+✅ Android 7.0 ou superior necessário
+⚠️ Primeira compilação é LENTA (seja paciente!)
+⚠️ Requer internet durante compilação
+⚠️ Mineração consome bateria intensivamente
+
+════════════════════════════════════════════════════════════════
+💡 DICAS
+════════════════════════════════════════════════════════════════
+
+1. Use Android Studio para primeira compilação (mais fácil)
+2. Tenha paciência na primeira vez (5-15 minutos)
+3. Conecte celular via USB para instalar direto
+4. Verifique logs com: adb logcat | grep VerusMiner
+5. Desative otimização de bateria no app após instalar
+
+════════════════════════════════════════════════════════════════
+📚 ARQUIVOS DO PROJETO
+════════════════════════════════════════════════════════════════
+
+build.gradle.kts              - Configuração Gradle principal
+app/build.gradle.kts          - Configuração do app
+app/src/main/java/            - Código Kotlin
+app/src/main/res/             - Recursos (layouts, strings)
+app/src/main/assets/ccminer/  - Binário CCMiner ARM64
+.github/workflows/build.yml   - GitHub Actions workflow
+
+════════════════════════════════════════════════════════════════
+🎯 PRONTO PARA COMPILAR!
+════════════════════════════════════════════════════════════════
+
+Tudo está incluído no projeto:
+✅ Código fonte completo
+✅ Binário CCMiner (não precisa baixar)
+✅ Configurações Gradle
+✅ Material Design 3
+✅ Documentação
+
+Basta abrir no Android Studio e compilar!
+
+════════════════════════════════════════════════════════════════

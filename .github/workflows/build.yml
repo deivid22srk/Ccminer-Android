@@ -22,18 +22,11 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    - name: Download CCMiner binaries
+    - name: Verify CCMiner binaries
       run: |
-        mkdir -p app/src/main/assets/ccminer/arm64-v8a
-        mkdir -p app/src/main/assets/ccminer/armeabi-v7a
-        
-        # Download pre-compiled ccminer for ARM64
-        wget -O app/src/main/assets/ccminer/arm64-v8a/ccminer https://github.com/Oink70/CCminer-ARM-optimized/releases/download/v3.8.3-4/ccminer-3.8.3-4 || echo "Download failed, using backup"
-        
-        # Make executables
-        chmod +x app/src/main/assets/ccminer/arm64-v8a/ccminer || true
-        
         ls -la app/src/main/assets/ccminer/
+        file app/src/main/assets/ccminer/arm64-v8a/ccminer
+        echo "CCMiner binary is included in the repository"
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew

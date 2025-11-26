@@ -29,20 +29,17 @@ git clone <repository-url>
 cd VerusMiner
 ```
 
-2. Download ccminer binaries:
-```bash
-./scripts/download_ccminer.sh
-```
-
-3. Build with Android Studio or command line:
+2. Build with Android Studio or command line:
 ```bash
 ./gradlew assembleDebug
 ```
 
-4. Install the APK on your device:
+3. Install the APK on your device:
 ```bash
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
+
+**Note:** CCMiner binary is already included in the repository, no manual download needed!
 
 ### From GitHub Actions
 
