@@ -11,11 +11,13 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.verusminer.app.MainActivity
 import com.verusminer.app.R
 import com.verusminer.app.data.MinerConfig
 import com.verusminer.app.data.MiningStats
+import com.verusminer.app.viewmodel.ParcelableMinerConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -55,19 +57,35 @@ class MiningService : Service() {
     }
     
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.d(TAG, "onStartCommand: action=${intent?.action}")
         when (intent?.action) {
             ACTION_START_MINING -> {
-                val config = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    intent.getParcelableExtra(EXTRA_CONFIG, MinerConfig::class.java)
+                val parcelableConfig = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    intent.getParcelableExtra(EXTRA_CONFIG, ParcelableMinerConfig::class.java)
                 } else {
                     @Suppress("DEPRECATION")
-                    intent.getParcelableExtra(EXTRA_CONFIG)
-                } ?: return START_NOT_STICKY
+                    intent.getParcelableExtra<ParcelableMinerConfig>(EXTRA_CONFIG)
+                }
                 
+                if (parcelableConfig == null) {
+                    Log.e(TAG, "Config is null, cannot start mining")
+                    return START_NOT_STICKY
+                }
+                
+                val config = MinerConfig(
+                    walletAddress = parcelableConfig.walletAddress,
+                    poolUrl = parcelableConfig.poolUrl,
+                    workerName = parcelableConfig.workerName,
+                    cpuThreads = parcelableConfig.cpuThreads,
+                    algorithm = parcelableConfig.algorithm
+                )
+                
+                Log.d(TAG, "Starting mining with config: $config")
                 startForeground(NOTIFICATION_ID, createNotification())
                 startMining(config)
             }
             ACTION_STOP_MINING -> {
+                Log.d(TAG, "Stopping mining")
                 stopMining()
                 stopSelf()
             }
@@ -76,19 +94,27 @@ class MiningService : Service() {
     }
     
     private fun startMining(config: MinerConfig) {
-        if (_isMining.value) return
+        Log.d(TAG, "startMining called")
+        if (_isMining.value) {
+            Log.d(TAG, "Already mining, ignoring")
+            return
+        }
         
         serviceScope.launch {
             try {
+                Log.d(TAG, "Extracting ccminer binary...")
                 val ccminerPath = extractCCMiner()
                 if (ccminerPath == null) {
+                    Log.e(TAG, "Failed to extract ccminer")
                     _isMining.value = false
                     return@launch
                 }
+                Log.d(TAG, "CCMiner extracted to: $ccminerPath")
                 
                 val configPath = createConfigFile(config)
+                Log.d(TAG, "Config created at: $configPath")
                 
-                val processBuilder = ProcessBuilder(
+                val command = listOf(
                     ccminerPath,
                     "-a", config.algorithm,
                     "-o", "stratum+tcp://${config.poolUrl}",
@@ -97,6 +123,9 @@ class MiningService : Service() {
                     "-t", config.cpuThreads.toString()
                 )
                 
+                Log.d(TAG, "Starting ccminer with command: ${command.joinToString(" ")}")
+                
+                val processBuilder = ProcessBuilder(command)
                 processBuilder.directory(filesDir)
                 processBuilder.redirectErrorStream(true)
                 
@@ -104,10 +133,13 @@ class MiningService : Service() {
                 _isMining.value = true
                 startTime = System.currentTimeMillis()
                 
+                Log.d(TAG, "Mining process started!")
+                
                 monitorMiningOutput()
                 updateStatsLoop()
                 
             } catch (e: Exception) {
+                Log.e(TAG, "Error starting mining", e)
                 e.printStackTrace()
                 _isMining.value = false
             }
@@ -123,24 +155,42 @@ class MiningService : Service() {
     
     private fun extractCCMiner(): String? {
         return try {
+            Log.d(TAG, "Detecting ABI...")
             val abi = when {
                 Build.SUPPORTED_ABIS.contains("arm64-v8a") -> "arm64-v8a"
                 Build.SUPPORTED_ABIS.contains("armeabi-v7a") -> "armeabi-v7a"
-                else -> return null
+                else -> {
+                    Log.e(TAG, "Unsupported ABI: ${Build.SUPPORTED_ABIS.joinToString()}")
+                    return null
+                }
             }
+            Log.d(TAG, "Using ABI: $abi")
             
             val ccminerFile = File(filesDir, "ccminer")
             
-            assets.open("ccminer/$abi/ccminer").use { input ->
+            if (ccminerFile.exists()) {
+                Log.d(TAG, "CCMiner already extracted, reusing")
+                return ccminerFile.absolutePath
+            }
+            
+            Log.d(TAG, "Extracting ccminer from assets...")
+            val assetPath = "ccminer/$abi/ccminer"
+            Log.d(TAG, "Asset path: $assetPath")
+            
+            assets.open(assetPath).use { input ->
                 ccminerFile.outputStream().use { output ->
-                    input.copyTo(output)
+                    val bytescopied = input.copyTo(output)
+                    Log.d(TAG, "Copied $bytescopied bytes")
                 }
             }
             
+            Log.d(TAG, "Setting executable permissions...")
             Runtime.getRuntime().exec("chmod 755 ${ccminerFile.absolutePath}").waitFor()
             
+            Log.d(TAG, "CCMiner ready at: ${ccminerFile.absolutePath}")
             ccminerFile.absolutePath
         } catch (e: Exception) {
+            Log.e(TAG, "Error extracting ccminer", e)
             e.printStackTrace()
             null
         }
@@ -179,31 +229,37 @@ class MiningService : Service() {
     
     private fun parseMiningOutput(line: String) {
         try {
+            Log.d(TAG, "Miner output: $line")
             when {
                 line.contains("accepted", ignoreCase = true) -> {
                     _miningStats.value = _miningStats.value.copy(
                         acceptedShares = _miningStats.value.acceptedShares + 1
                     )
+                    Log.d(TAG, "Share accepted! Total: ${_miningStats.value.acceptedShares}")
                 }
                 line.contains("rejected", ignoreCase = true) -> {
                     _miningStats.value = _miningStats.value.copy(
                         rejectedShares = _miningStats.value.rejectedShares + 1
                     )
+                    Log.d(TAG, "Share rejected! Total: ${_miningStats.value.rejectedShares}")
                 }
                 line.contains("H/s", ignoreCase = true) || line.contains("MH/s", ignoreCase = true) -> {
                     val hashrate = extractHashrate(line)
                     if (hashrate > 0) {
                         _miningStats.value = _miningStats.value.copy(hashrate = hashrate)
+                        Log.d(TAG, "Hashrate: $hashrate H/s")
                     }
                 }
                 line.contains("diff", ignoreCase = true) -> {
                     val diff = extractDifficulty(line)
                     if (diff > 0) {
                         _miningStats.value = _miningStats.value.copy(difficulty = diff)
+                        Log.d(TAG, "Difficulty: $diff")
                     }
                 }
             }
         } catch (e: Exception) {
+            Log.e(TAG, "Error parsing output", e)
             e.printStackTrace()
         }
     }
@@ -308,6 +364,7 @@ class MiningService : Service() {
     }
     
     companion object {
+        private const val TAG = "MiningService"
         private const val CHANNEL_ID = "mining_channel"
         private const val NOTIFICATION_ID = 1
         const val ACTION_START_MINING = "com.verusminer.app.START_MINING"

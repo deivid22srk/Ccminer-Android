@@ -39,6 +39,11 @@ fun MinerConfig.toParcelable() = ParcelableMinerConfig(
 
 class MiningViewModel(application: Application) : AndroidViewModel(application) {
     
+    companion object {
+        private const val TAG = "MiningViewModel"
+    }
+    
+    private val appContext = application.applicationContext
     private val preferencesManager = PreferencesManager(application)
     private var miningService: MiningService? = null
     private var bound = false
@@ -127,16 +132,28 @@ class MiningViewModel(application: Application) : AndroidViewModel(application) 
     
     suspend fun startMining(context: Context) {
         val config = minerConfig.first()
-        val intent = Intent(context, MiningService::class.java).apply {
-            action = MiningService.ACTION_START_MINING
-            putExtra(MiningService.EXTRA_CONFIG, config.toParcelable())
+        Log.d(TAG, "startMining called with config: $config")
+        
+        if (config.walletAddress.isBlank()) {
+            Log.e(TAG, "Wallet address is empty!")
+            return
         }
         
+        val parcelableConfig = config.toParcelable()
+        Log.d(TAG, "Created parcelable config: $parcelableConfig")
+        
+        val intent = Intent(context, MiningService::class.java).apply {
+            action = MiningService.ACTION_START_MINING
+            putExtra(MiningService.EXTRA_CONFIG, parcelableConfig)
+        }
+        
+        Log.d(TAG, "Starting service...")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(intent)
         } else {
             context.startService(intent)
         }
+        Log.d(TAG, "Service start command sent")
     }
     
     fun stopMining(context: Context) {

@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -174,6 +175,19 @@ fun MiningScreen(
                         if (isMining) {
                             viewModel.stopMining(context)
                         } else {
+                            if (minerConfig.walletAddress.isBlank()) {
+                                Toast.makeText(
+                                    context,
+                                    "Please enter your wallet address first!",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                return@launch
+                            }
+                            Toast.makeText(
+                                context,
+                                "Starting mining...",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             viewModel.startMining(context)
                         }
                     }

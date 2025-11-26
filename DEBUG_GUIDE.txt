@@ -1,0 +1,229 @@
+═══════════════════════════════════════════════════════════════════
+                    GUIA DE DEBUG - VERUS MINER
+═══════════════════════════════════════════════════════════════════
+
+Se você clicar no botão PLAY e nada acontecer, siga estes passos:
+
+═══════════════════════════════════════════════════════════════════
+🔍 PASSO 1: VERIFICAR LOGS EM TEMPO REAL
+═══════════════════════════════════════════════════════════════════
+
+Conecte o celular via USB e execute:
+
+# Linux/Mac:
+./debug-logs.sh
+
+# Windows:
+adb logcat | findstr "VerusMiner MiningService MiningViewModel"
+
+# Comando completo:
+adb logcat -c
+adb logcat | grep -E "(VerusMiner|MiningService|MiningViewModel|ccminer)"
+
+═══════════════════════════════════════════════════════════════════
+📋 O QUE VERIFICAR NOS LOGS
+═══════════════════════════════════════════════════════════════════
+
+Quando você clicar no botão PLAY, deve aparecer:
+
+✅ "MiningViewModel: startMining called with config: ..."
+✅ "MiningViewModel: Created parcelable config: ..."
+✅ "MiningViewModel: Starting service..."
+✅ "MiningService: onStartCommand: action=..."
+✅ "MiningService: Detecting ABI..."
+✅ "MiningService: Using ABI: arm64-v8a"
+✅ "MiningService: Extracting ccminer..."
+✅ "MiningService: Starting ccminer with command..."
+✅ "MiningService: Mining process started!"
+
+Se NÃO aparecer:
+❌ Problema no código ou configuração
+
+═══════════════════════════════════════════════════════════════════
+⚠️ PROBLEMAS COMUNS E SOLUÇÕES
+═══════════════════════════════════════════════════════════════════
+
+PROBLEMA 1: Nada aparece nos logs
+────────────────────────────────────
+Solução:
+- Verifique se o app está instalado
+- Abra o app no celular
+- Tente clicar no botão novamente
+- Execute: adb logcat -c (limpa logs) e tente de novo
+
+PROBLEMA 2: "Wallet address is empty!"
+────────────────────────────────────
+Solução:
+- Digite um endereço de carteira Verus no campo
+- Formato: RXXxxxXXXxxxXXXxxxXXX... (começa com R)
+- Salve e tente novamente
+
+PROBLEMA 3: "Failed to extract ccminer"
+────────────────────────────────────
+Solução:
+- Verifique se o binário está em:
+  app/src/main/assets/ccminer/arm64-v8a/ccminer
+- Recompile o APK
+- Verifique se seu celular é ARM64
+
+PROBLEMA 4: "Unsupported ABI"
+────────────────────────────────────
+Solução:
+- Seu celular não é ARM64
+- Verifique arquitetura com: adb shell getprop ro.product.cpu.abi
+- Deve ser: arm64-v8a
+
+PROBLEMA 5: Serviço não inicia
+────────────────────────────────────
+Solução:
+- Verifique permissões no AndroidManifest.xml
+- Desative otimização de bateria (botão na toolbar)
+- Verifique se tem internet
+
+PROBLEMA 6: Processo inicia mas não minera
+────────────────────────────────────
+Solução:
+- Verifique se o endereço da carteira é válido
+- Teste conectividade com a pool:
+  ping na.vipor.net
+- Tente outra pool
+
+═══════════════════════════════════════════════════════════════════
+🔧 COMANDOS ÚTEIS DE DEBUG
+═══════════════════════════════════════════════════════════════════
+
+# Ver informações do celular
+adb shell getprop ro.product.cpu.abi
+
+# Ver processos do app
+adb shell ps | grep verusminer
+
+# Ver arquivos do app
+adb shell ls -la /data/data/com.verusminer.app/files/
+
+# Ver se ccminer foi extraído
+adb shell ls -la /data/data/com.verusminer.app/files/ccminer
+
+# Executar ccminer manualmente para testar
+adb shell
+cd /data/data/com.verusminer.app/files
+./ccminer --help
+
+# Forçar parar o app
+adb shell am force-stop com.verusminer.app
+
+# Reinstalar app
+adb uninstall com.verusminer.app
+adb install app/build/outputs/apk/debug/app-debug.apk
+
+# Ver logs completos
+adb logcat
+
+# Limpar logs
+adb logcat -c
+
+═══════════════════════════════════════════════════════════════════
+📱 VERIFICAR NO CELULAR
+═══════════════════════════════════════════════════════════════════
+
+1. Abra o app
+2. Vá em Configurações do Android
+3. Apps > Verus Miner
+4. Verifique permissões:
+   ✅ Internet
+   ✅ Executar em segundo plano
+   ✅ Notificações
+5. Bateria:
+   ✅ Sem restrições (clique no botão bateria no app)
+
+═══════════════════════════════════════════════════════════════════
+🧪 TESTE BÁSICO
+═══════════════════════════════════════════════════════════════════
+
+1. Abra o app
+2. Digite carteira: RTest123456789... (exemplo)
+3. Pool: Vipor NA (já vem configurada)
+4. Worker: test
+5. Threads: 2
+6. Clique PLAY
+7. Veja notificação aparecer
+8. Veja "Mining Active" no card superior
+9. Aguarde alguns segundos
+10. Hashrate deve aparecer (pode levar 10-30s)
+
+═══════════════════════════════════════════════════════════════════
+📊 LOGS IMPORTANTES
+═══════════════════════════════════════════════════════════════════
+
+Se aparecer nos logs:
+✅ "Mining process started!" = Tudo OK!
+✅ "Miner output: ..." = CCMiner está rodando!
+✅ "Hashrate: X H/s" = Minerando!
+✅ "Share accepted!" = Conectado na pool!
+
+Se aparecer:
+❌ "Failed to extract ccminer" = Binário não foi extraído
+❌ "Wallet address is empty" = Preencha a carteira
+❌ "Unsupported ABI" = Celular não é ARM64
+❌ "FileNotFoundException" = Binário não está no APK
+
+═══════════════════════════════════════════════════════════════════
+🆘 AINDA NÃO FUNCIONA?
+═══════════════════════════════════════════════════════════════════
+
+1. Certifique-se que compilou com o binário incluído:
+   unzip -l app/build/outputs/apk/debug/app-debug.apk | grep ccminer
+
+2. Reinstale completamente:
+   adb uninstall com.verusminer.app
+   adb install app/build/outputs/apk/debug/app-debug.apk
+
+3. Verifique versão do Android:
+   adb shell getprop ro.build.version.sdk
+   (Deve ser >= 24)
+
+4. Teste extração manual:
+   adb shell
+   cd /data/data/com.verusminer.app/files
+   ls -la ccminer
+   ./ccminer --help
+
+5. Se o ccminer executar manualmente mas não no app:
+   - Problema nas permissões do app
+   - Reinstale e conceda todas permissões
+
+═══════════════════════════════════════════════════════════════════
+💬 EXEMPLO DE LOGS CORRETOS
+═══════════════════════════════════════════════════════════════════
+
+D/MiningViewModel: startMining called with config: MinerConfig(...)
+D/MiningViewModel: Created parcelable config: ParcelableMinerConfig(...)
+D/MiningViewModel: Starting service...
+D/MiningService: onStartCommand: action=com.verusminer.app.START_MINING
+D/MiningService: Starting mining with config: MinerConfig(...)
+D/MiningService: startMining called
+D/MiningService: Detecting ABI...
+D/MiningService: Using ABI: arm64-v8a
+D/MiningService: Extracting ccminer from assets...
+D/MiningService: Asset path: ccminer/arm64-v8a/ccminer
+D/MiningService: Copied 163816 bytes
+D/MiningService: Setting executable permissions...
+D/MiningService: CCMiner ready at: /data/data/.../files/ccminer
+D/MiningService: Config created at: /data/data/.../files/config.json
+D/MiningService: Starting ccminer with command: /data/.../ccminer -a verus...
+D/MiningService: Mining process started!
+D/MiningService: Miner output: Starting ccminer...
+D/MiningService: Miner output: Connecting to na.vipor.net:5040...
+D/MiningService: Miner output: 5.2 MH/s
+D/MiningService: Hashrate: 5200000.0 H/s
+D/MiningService: Miner output: accepted: 1/1
+D/MiningService: Share accepted! Total: 1
+
+═══════════════════════════════════════════════════════════════════
+
+Se os logs mostrarem isso, está funcionando perfeitamente!
+
+Se não aparecer nada ou aparecer erros, copie os logs e
+investigue a mensagem de erro específica.
+
+═══════════════════════════════════════════════════════════════════
