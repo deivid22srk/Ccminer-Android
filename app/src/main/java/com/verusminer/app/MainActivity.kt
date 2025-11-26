@@ -129,6 +129,7 @@ fun MiningScreen(
     viewModel: MiningViewModel,
     onRequestBatteryOptimization: () -> Unit
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     val minerConfig by viewModel.minerConfig.collectAsState()
     val miningStats by viewModel.miningStats.collectAsState()
     val isMining by viewModel.isMining.collectAsState()
@@ -171,9 +172,9 @@ fun MiningScreen(
                 onClick = {
                     scope.launch {
                         if (isMining) {
-                            viewModel.stopMining(androidx.compose.ui.platform.LocalContext.current)
+                            viewModel.stopMining(context)
                         } else {
-                            viewModel.startMining(androidx.compose.ui.platform.LocalContext.current)
+                            viewModel.startMining(context)
                         }
                     }
                 },
