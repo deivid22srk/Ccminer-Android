@@ -1,0 +1,7 @@
+Place the ccminer binary in this directory (optional for 32-bit ARM devices).
+
+Download from:
+https://github.com/Oink70/CCminer-ARM-optimized/releases
+
+File must be named: ccminer
+File must be executable: chmod +x ccminer

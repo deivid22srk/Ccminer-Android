@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Verus Miner</string>
+    <string name="mining_notification_channel_id">mining_channel</string>
+    <string name="mining_notification_channel_name">Mining Service</string>
+    <string name="mining_notification_title">Verus Mining Active</string>
+    <string name="mining_notification_text">Mining in progress…</string>
+</resources>

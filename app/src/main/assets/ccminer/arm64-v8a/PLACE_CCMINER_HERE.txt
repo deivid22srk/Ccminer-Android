@@ -1,0 +1,9 @@
+Place the ccminer binary in this directory.
+
+Download from:
+https://github.com/Oink70/CCminer-ARM-optimized/releases
+
+File must be named: ccminer
+File must be executable: chmod +x ccminer
+
+OR run: ./scripts/download_ccminer.sh from project root

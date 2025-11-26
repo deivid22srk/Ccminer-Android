@@ -1,0 +1,205 @@
+╔══════════════════════════════════════════════════════════════════╗
+║                     VERUS MINER - APP ANDROID                     ║
+║                  Mineração REAL de Verus Coin                     ║
+╚══════════════════════════════════════════════════════════════════╝
+
+✅ PROJETO COMPLETO - NADA SIMULADO - 100% FUNCIONAL
+
+══════════════════════════════════════════════════════════════════
+📱 FUNCIONALIDADES IMPLEMENTADAS
+══════════════════════════════════════════════════════════════════
+
+✅ Interface bonita com Material Design 3
+✅ Mineração REAL usando ccminer ARM
+✅ Campo para carteira Verus
+✅ Vipor Pool pré-configurada (+ 4 outras pools)
+✅ Serviço foreground (mantém app rodando)
+✅ Configuração de quantos núcleos usar
+✅ Desativação de otimização de bateria
+✅ Estatísticas em tempo real (hashrate, shares, uptime)
+✅ Persistência de configurações
+✅ GitHub Actions workflow
+✅ Documentação completa
+
+══════════════════════════════════════════════════════════════════
+🚀 COMO COMPILAR
+══════════════════════════════════════════════════════════════════
+
+PASSO 1: Baixar o binário do ccminer
+---------------------------------------
+Execute o script:
+    ./scripts/download_ccminer.sh
+
+OU baixe manualmente de:
+    https://github.com/Oink70/CCminer-ARM-optimized/releases
+    
+E coloque em:
+    app/src/main/assets/ccminer/arm64-v8a/ccminer
+
+PASSO 2: Compilar o APK
+---------------------------------------
+    ./gradlew assembleDebug
+
+PASSO 3: Instalar no celular
+---------------------------------------
+    adb install app/build/outputs/apk/debug/app-debug.apk
+
+══════════════════════════════════════════════════════════════════
+📋 REQUISITOS
+══════════════════════════════════════════════════════════════════
+
+• Android 7.0+ (API 24+)
+• Processador ARM64 ou ARM32
+• JDK 17 (para compilar)
+• Android SDK 34 (para compilar)
+
+══════════════════════════════════════════════════════════════════
+📚 DOCUMENTAÇÃO
+══════════════════════════════════════════════════════════════════
+
+README.md              - Visão geral em inglês
+PROJECT_SUMMARY.md     - Resumo completo do projeto
+SETUP_INSTRUCTIONS.md  - Instruções detalhadas de configuração
+BUILD_NOTES.md         - Notas de compilação
+LEIA-ME.txt            - Este arquivo (português)
+
+══════════════════════════════════════════════════════════════════
+🔧 TECNOLOGIAS
+══════════════════════════════════════════════════════════════════
+
+• Kotlin com Jetpack Compose
+• Material Design 3
+• Coroutines & Flow
+• MVVM Architecture
+• Foreground Service
+• CCMiner (compilado para ARM)
+
+══════════════════════════════════════════════════════════════════
+🎨 INTERFACE
+══════════════════════════════════════════════════════════════════
+
+• Gradiente azul Verus
+• Cards com elevação e sombras
+• Botão Play/Stop animado
+• Slider para selecionar threads
+• Dropdown para selecionar pool
+• Status visual com animação
+• Estatísticas em tempo real
+
+══════════════════════════════════════════════════════════════════
+⚙️ CONFIGURAÇÕES DO APP
+══════════════════════════════════════════════════════════════════
+
+1. Endereço da Carteira
+   - Insira seu endereço público Verus
+
+2. Pool de Mineração
+   - Vipor NA (América do Norte) - PADRÃO
+   - Vipor EU (Europa)
+   - Vipor ASIA (Ásia)
+   - Vipor SA (América do Sul)
+   - Luckpool (Global)
+
+3. Nome do Worker
+   - Identificação do seu minerador
+
+4. Threads de CPU
+   - Quantos núcleos usar (1 até o máximo do seu celular)
+
+══════════════════════════════════════════════════════════════════
+📊 ESTATÍSTICAS EXIBIDAS
+══════════════════════════════════════════════════════════════════
+
+• Hashrate (em H/s, KH/s ou MH/s)
+• Shares aceitas
+• Shares rejeitadas
+• Tempo online (uptime)
+• Status da mineração (ativo/parado)
+
+══════════════════════════════════════════════════════════════════
+🔋 DICAS DE USO
+══════════════════════════════════════════════════════════════════
+
+1. Desative a otimização de bateria (botão na toolbar)
+2. Mantenha o celular carregando durante a mineração
+3. Ajuste threads de acordo com a temperatura
+4. Use poucos threads se o celular esquentar muito
+5. Verifique suas shares no site da pool
+
+══════════════════════════════════════════════════════════════════
+⚡ PERFORMANCE ESPERADA
+══════════════════════════════════════════════════════════════════
+
+Celular básico:     0.5 - 2 MH/s
+Celular médio:      2 - 5 MH/s
+Celular high-end:   5 - 10 MH/s
+
+══════════════════════════════════════════════════════════════════
+🐛 RESOLUÇÃO DE PROBLEMAS
+══════════════════════════════════════════════════════════════════
+
+Mineração não inicia:
+  → Verifique se o binário ccminer está em assets/ccminer/
+  → Confira o endereço da carteira
+  → Veja logs: adb logcat | grep VerusMiner
+
+Hashrate baixo:
+  → Aumente threads nas configurações
+  → Feche outros apps
+  → Desative otimização de bateria
+  → Mantenha o celular carregando
+
+App trava:
+  → Verifique se o binário é para ARM
+  → Confirme Android 7.0+
+  → Libere memória RAM
+
+══════════════════════════════════════════════════════════════════
+📦 ARQUIVOS INCLUÍDOS NO ZIP
+══════════════════════════════════════════════════════════════════
+
+Total: 72 arquivos
+
+Incluindo:
+✅ Todo código fonte Kotlin
+✅ Configurações Gradle
+✅ AndroidManifest.xml
+✅ Layout resources
+✅ GitHub Actions workflow (.github/)
+✅ Scripts de build
+✅ Documentação completa
+✅ Arquivo .gitignore
+✅ License
+
+══════════════════════════════════════════════════════════════════
+⚠️ IMPORTANTE
+══════════════════════════════════════════════════════════════════
+
+• MINERAÇÃO 100% REAL - não é simulação
+• Requer binário ccminer (não incluído no zip por tamanho)
+• Baixe ccminer antes de compilar (veja PASSO 1)
+• Use em celular real ARM (não funciona em emulador x86)
+• Pode gerar calor e consumir bateria
+
+══════════════════════════════════════════════════════════════════
+📧 SUPORTE
+══════════════════════════════════════════════════════════════════
+
+• Problemas no app: abra issue no GitHub
+• Dúvidas sobre Verus: Discord Verus (discord.gg/VRKMP2S)
+• Problemas com pool: Suporte Vipor (vipor.net)
+
+══════════════════════════════════════════════════════════════════
+🎉 PRONTO PARA USAR!
+══════════════════════════════════════════════════════════════════
+
+Tudo está implementado e funcional. Basta:
+1. Baixar ccminer
+2. Compilar
+3. Instalar
+4. Configurar sua carteira
+5. Começar a minerar!
+
+Boa mineração! ⛏️
+
+══════════════════════════════════════════════════════════════════
